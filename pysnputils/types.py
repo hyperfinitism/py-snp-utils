@@ -157,8 +157,8 @@ class GuestPolicy:
     def __init__(self, raw: bytes, report_version: int = 5):
         if len(raw) != GUEST_POLICY_SIZE:
             raise ValueError(f"Invalid GuestPolicy length: expected {GUEST_POLICY_SIZE} bytes, got {len(raw)}")
-        self.raw = bytes(raw)
-        self.report_version = int(report_version)
+        self.raw = raw
+        self.report_version = report_version
 
     def to_dict(self) -> dict:
         """Convert GuestPolicy to a dictionary."""
@@ -270,8 +270,8 @@ class PlatformInfo:
             raise ValueError(
                 f"Invalid PlatformInfo length: expected {PLATFORM_INFO_SIZE} bytes, got {len(raw)}"
             )
-        self.raw = bytes(raw)  # immutable copy
-        self.report_version = int(report_version)
+        self.raw = raw
+        self.report_version = report_version
 
     def _get_bit(self, bit: int) -> int:
         val = int.from_bytes(self.raw, "little")
@@ -359,7 +359,7 @@ class KeyInfo:
             raise ValueError(
                 f"Invalid KeyInfo length: expected {KEY_INFO_SIZE} bytes, got {len(raw)}"
             )
-        self.raw = bytes(raw)
+        self.raw = raw
 
     def to_dict(self) -> dict:
         """Convert KeyInfo to a dictionary."""
@@ -428,8 +428,8 @@ class TcbVersion:
     def __init__(self, raw: bytes, turin: bool = False):
         if len(raw) != TCB_VERSION_SIZE:
             raise ValueError(f"Invalid TcbVersion length: expected {TCB_VERSION_SIZE} bytes, got {len(raw)}")
-        self.raw = bytes(raw)
-        self.turin = bool(turin)
+        self.raw = raw
+        self.turin = turin
 
     def to_dict(self) -> dict:
         """Convert TcbVersion to a dictionary."""
@@ -445,7 +445,7 @@ class TcbVersion:
     @classmethod
     def from_bytes(cls, data: bytes, turin: bool = False) -> "TcbVersion":
         """Create TcbVersion from 8 bytes (64 bits)."""
-        return cls(raw=bytes(data), turin=bool(turin))
+        return cls(raw=data, turin=turin)
 
     # Properties
     @property
@@ -502,7 +502,7 @@ class EcdsaSignature:
     def __init__(self, raw: bytes):
         if len(raw) != ECDSA_SIGNATURE_SIZE:
             raise ValueError(f"Invalid EcdsaSignature length: expected {ECDSA_SIGNATURE_SIZE} bytes, got {len(raw)}")
-        self.raw = bytes(raw)
+        self.raw = raw
 
     def to_dict(self) -> dict:
         """Convert EcdsaSignature to a dictionary."""
@@ -591,7 +591,7 @@ class AttestationReport:
     def __init__(self, raw: bytes):
         if len(raw) != SNP_ATTESTATION_REPORT_LEN:
             raise ValueError(f"Invalid AttestationReport length: expected {SNP_ATTESTATION_REPORT_LEN} bytes, got {len(raw)}")
-        self.raw = bytes(raw)
+        self.raw = raw
 
     def get_processor_model(self) -> ProcessorModel:
         """Autodetect processor model from the attestation report."""
