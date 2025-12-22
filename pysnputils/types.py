@@ -586,16 +586,23 @@ class AttestationReport:
     """
     # Fields
     raw: bytes = bytes(SNP_ATTESTATION_REPORT_LEN)
+    processor_model: ProcessorModel = ProcessorModel.MILAN
 
     # Methods
-    def __init__(self, raw: bytes):
+    def __init__(self, raw: bytes, processor_model: ProcessorModel | None = None):
         if len(raw) != SNP_ATTESTATION_REPORT_LEN:
             raise ValueError(f"Invalid AttestationReport length: expected {SNP_ATTESTATION_REPORT_LEN} bytes, got {len(raw)}")
         self.raw = raw
-
-    def get_processor_model(self) -> ProcessorModel:
-        """Autodetect processor model from the attestation report."""
-        return detect_processor_model(self.version, self.cpuid_fam_id, self.cpuid_mod_id, self.chip_id)
+        if processor_model is None:
+            version = int.from_bytes(raw[0x00:4], "little")
+            if version < 3:
+                raise ValueError("Report version must be 3+ or processor model must be specified")
+            cpuid_fam_id = int.from_bytes(raw[0x188:0x189], "little")
+            cpuid_mod_id = int.from_bytes(raw[0x189:0x18A], "little")
+            chip_id = raw[0x1A0:0x1E0]
+            self.processor_model = detect_processor_model(version, cpuid_fam_id, cpuid_mod_id, chip_id)
+        else:
+            self.processor_model = ProcessorModel(processor_model)
 
     def to_dict(self) -> dict:
         """Convert AttestationReport to a dictionary."""
@@ -637,9 +644,9 @@ class AttestationReport:
 
     # Class Methods
     @classmethod
-    def from_bytes(cls, data: bytes) -> "AttestationReport":
+    def from_bytes(cls, data: bytes, processor_model: ProcessorModel | None = None) -> "AttestationReport":
         """Create AttestationReport from 1184 bytes."""
-        return cls(raw=data)
+        return cls(raw=data, processor_model=processor_model)
 
     # Properties
     @property
@@ -680,7 +687,7 @@ class AttestationReport:
     @property
     def current_tcb(self) -> TcbVersion:
         """Current TCB."""
-        turin = self.get_processor_model() == ProcessorModel.TURIN
+        turin = self.processor_model == ProcessorModel.TURIN
         return TcbVersion.from_bytes(self.raw[0x38:0x40], turin=turin)
 
     @property
@@ -731,7 +738,7 @@ class AttestationReport:
     @property
     def reported_tcb(self) -> TcbVersion:
         """Reported TCB."""
-        turin = self.get_processor_model() == ProcessorModel.TURIN
+        turin = self.processor_model == ProcessorModel.TURIN
         return TcbVersion.from_bytes(self.raw[0x180:0x188], turin=turin)
 
     @property
@@ -763,7 +770,7 @@ class AttestationReport:
     @property
     def committed_tcb(self) -> TcbVersion:
         """Committed TCB."""
-        turin = self.get_processor_model() == ProcessorModel.TURIN
+        turin = self.processor_model == ProcessorModel.TURIN
         return TcbVersion.from_bytes(self.raw[0x1E0:0x1E8], turin=turin)
 
     @property
@@ -799,7 +806,7 @@ class AttestationReport:
     @property
     def launch_tcb(self) -> TcbVersion:
         """Launch TCB."""
-        turin = self.get_processor_model() == ProcessorModel.TURIN
+        turin = self.processor_model == ProcessorModel.TURIN
         return TcbVersion.from_bytes(self.raw[0x1F0:0x1F8], turin=turin)
 
     @property
