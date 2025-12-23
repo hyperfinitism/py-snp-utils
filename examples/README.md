@@ -1,0 +1,71 @@
+# Example CLI tools using pysnputils
+
+## Usage
+
+### Common
+
+```shell
+python $SCRIPT_PATH [OPTIONS...]
+```
+
+or
+
+```shell
+# grant permission to execute
+# chmod +x $SCRIPT_PATH
+$SCRIPT_PATH [OPTIONS...]
+```
+
+### display
+
+```shell
+python display.py -i $REPORT_PATH [-p $PROCESSOR_MODEL]
+```
+
+```shell
+python display.py --in $REPORT_PATH [--processor-model $PROCESSOR_MODEL]
+```
+
+### fetch
+
+```shell
+python fetch.py -i $REPORT_PATH -o $CERTS_DIR [-p $PROCESSOR_MODEL]
+```
+
+```shell
+python fetch.py --in $REPORT_PATH --outdir $CERTS_DIR [--processor-model $PROCESSOR_MODEL]
+```
+
+### verify
+
+```shell
+python verify.py -r $REPORT_PATH -c $CERTS_DIR [-p $PROCESSOR_MODEL]
+```
+
+```shell
+python verify.py --report $REPORT_PATH --certs $CERTS_DIR [--processor-model $PROCESSOR_MODEL]
+```
+
+## Notes
+
+- **`-p/--processor-model` is optional**: If omitted, it will attempt to automatically detect the processor model from the report.
+  - Automatic detection is supported from report version 3 or later.
+  - Report version 2 does not support automatic detection. `-p/--processor-model` must be specified.
+- **`fetch.py`**: requires network access to AMD KDS. It writes `vcek.pem`, `ask.pem`, `ark.pem`, and `crl.pem` into `$CERTS_DIR`.
+- **`verify.py`**: expects `$CERTS_DIR` to contain `vcek.pem`, `ask.pem`, and `ark.pem`.
+
+## Sample reports
+
+### reportV3.bin
+
+- Report Version: 3
+- Processor Model: Genoa
+
+### reportV5.bin
+
+- Report Version: 3
+- Processor Model: Milan
+
+
+
+
