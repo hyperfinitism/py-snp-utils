@@ -13,8 +13,6 @@ python $SCRIPT_PATH [OPTIONS...]
 or
 
 ```shell
-# grant permission to execute
-chmod +x $SCRIPT_PATH
 $SCRIPT_PATH [OPTIONS...]
 ```
 
